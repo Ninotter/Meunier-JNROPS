@@ -6,4 +6,5 @@ export interface Task {
   createdAt: string;
   updatedAt: string;
   limitedAt: string;
+  color: string;
 }
