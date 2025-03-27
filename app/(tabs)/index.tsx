@@ -1,10 +1,22 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
 import { useTaskStore } from '@/stores/taskStore';
 import { Plus, Trash2 } from 'lucide-react-native';
 
 export default function TasksScreen() {
   const { tasks, isLoading, error, fetchTasks, deleteTask, updateTask } = useTaskStore();
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+
+  const toggleSelection = (id: string) => {
+    setSelectedItems((prev: string[]) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+  
+  const deleteSelectedItems = () => {
+    selectedItems.forEach((id: string) => deleteTask(id));
+    setSelectedItems([]);
+  };
 
   useEffect(() => {
     fetchTasks();
@@ -29,35 +41,57 @@ export default function TasksScreen() {
   return (
     <View style={styles.container}>
       <FlatList
-        data={tasks}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.taskItem}>
-            <Pressable
-              onPress={() => updateTask(item.id, { completed: !item.completed })}
-              style={styles.taskContent}>
-              <Text style={[
+      data={tasks}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => (
+        <View style={styles.taskItem}>
+          <Pressable
+            onPress={() => toggleSelection(item.id)}
+            style={styles.checkboxContainer}>
+            <View style={[
+              styles.checkbox,
+              selectedItems.includes(item.id) && styles.checkboxSelected
+            ]} />
+          </Pressable>
+          <Pressable
+            onPress={() => updateTask(item.id, { completed: !item.completed })}
+            onLongPress={() => toggleSelection(item.id)}
+            style={styles.taskContent}>
+            <Text style={[
               styles.taskTitle,
               item.completed && styles.completedTask
-              ]}>
+            ]}>
               {item.title}
-              </Text>
-              <Text style={styles.taskDescription}>{item.description}</Text>
-              <Text style={[styles.taskTitle,
-              item.completed && styles.completedTask]}>Deadline: {item.limitedAt}</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => deleteTask(item.id)}
-              testID={`delete-button-${item.id}`}
-              style={styles.deleteButton}>
-              <Trash2 size={20} color="#FF3B30" />
-            </Pressable>
-          </View>
-        )}
+            </Text>
+            <Text style={styles.taskDescription}>{item.description}</Text>
+            <Text style={[
+              styles.taskTitle,
+              item.completed && styles.completedTask
+            ]}>
+              Deadline: {item.limitedAt}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => deleteTask(item.id)}
+            testID={`delete-button-${item.id}`}
+            style={styles.deleteButton}>
+            <Trash2 size={20} color="#FF3B30" />
+          </Pressable>
+        </View>
+      )}
       />
-      <Pressable style={styles.fab} testID='add-button'>
-        <Plus size={24} color="#FFFFFF" />
+      <Pressable
+      style={styles.fab}
+      testID='add-button'>
+      <Plus size={24} color="#FFFFFF" />
       </Pressable>
+      {selectedItems.length > 0 && (
+      <Pressable
+        style={styles.deleteSelectedButton}
+        onPress={deleteSelectedItems}>
+        <Text style={styles.deleteSelectedText}>Delete Selected</Text>
+      </Pressable>
+      )}
     </View>
   );
 }
@@ -121,5 +155,42 @@ const styles = StyleSheet.create({
     color: '#FF3B30',
     textAlign: 'center',
     marginTop: 16,
+  },
+  deleteSelectedButton: {
+    position: 'absolute',
+    bottom: 90,
+    right: 24,
+    backgroundColor: '#FF3B30',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  deleteSelectedText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  
+  checkboxContainer: {
+    padding: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 2,
+    borderColor: '#8E8E93',
+    borderRadius: 4,
+    backgroundColor: 'transparent',
+  },
+  checkboxSelected: {
+    backgroundColor: '#007AFF',
   },
 });
