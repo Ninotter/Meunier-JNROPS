@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable, SafeAreaView, Modal } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable, SafeAreaView, Modal, TextInput } from 'react-native';
 import { useTaskStore } from '@/stores/taskStore';
 import { Plus, Trash2 } from 'lucide-react-native';
-
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import TaskFormModal from '../TaskFormModal';
+import dayjs from 'dayjs';
+import DatePicker, { DateType } from 'react-native-ui-datepicker';
 
 export default function TasksScreen() {
   const { tasks, isLoading, error, fetchTasks, createTask, deleteTask, updateTask } = useTaskStore();
   const [modalVisible, setModalVisible] = useState(false);
+  const [titre, onChangeTitre] = useState('');
+  const [description, onChangeDescription] = useState('');
+  const [limitedAt, onChangeLimitedAt] = useState<DateType>(dayjs());
+
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
@@ -62,16 +66,60 @@ export default function TasksScreen() {
                    <SafeAreaView>
                        <Modal
                            animationType="slide"
-                           transparent={false}
+                           transparent={true}
                            visible={modalVisible}
                            onRequestClose={() => {setModalVisible(!modalVisible)}}>
-                               <View>
-                                   <View>
-                                       <Text>Test Modal</Text>
+                               <View style={styles.modalContainer}>
+                                       <Text style={styles.modalTitle}>Ajouter une tâche</Text>
+                                   <View style={styles.taskForm}>
+
+                                      <View style={styles.formField}>
+                                      <Text>Titre</Text>
+                                      <TextInput style={styles.textInput}
+                                      onChangeText={onChangeTitre}
+                                      value={titre}
+                                      placeholder='Entrez la description de la tâche...'>
+                                      </TextInput>
+                                      </View>
+
+                                      <View style={styles.formField}>
+                                      <Text>Description</Text>
+                                      <TextInput style={styles.textInput}
+                                      onChangeText={onChangeDescription}
+                                      value={description}
+                                      placeholder='Entrez la description de la tâche...'>
+                                      </TextInput>
+                                      </View>
+
+                                      <View style={styles.formField}>
+                                      <Text>Deadline</Text>
+                                      <DatePicker
+                                      style={styles.datePicker}
+                                          mode="single"
+                                          minDate={Date.now()}
+                                          onChange={event => onChangeLimitedAt(dayjs(event.date))}
+                                          date={limitedAt} 
+                                          styles={{
+                                            today: {borderColor:'rgba(179, 208, 248, 0.77)', borderWidth: 2},
+                                            selected: {backgroundColor:'rgba(104, 209, 176, 0.84)'},
+                                            selected_label: {color: 'white'},
+                                            disabled: {opacity: .3}
+                                          }}
+                                          />
+                                      </View>
                                    </View>
-                                   <Pressable
-                                   onPress={() => setModalVisible(!modalVisible)}
-                                   >Fermer</Pressable>
+                                   <Pressable style={styles.formButton}
+                                   onPress={() => {
+                                    if(titre != '') {
+                                      createTask({
+                                        title: titre,
+                                        description: description,
+                                        completed: false,
+                                        limitedAt: limitedAt != undefined ? limitedAt?.toLocaleString('fr-FR') : ''
+                                      })
+                                    }
+                                    setModalVisible(!modalVisible)}}
+                                   >AJOUTER</Pressable>
                                </View>
                            </Modal>
                    </SafeAreaView>
@@ -145,4 +193,54 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 16,
   },
+  modalContainer: {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems:'center',
+    gap: 30,
+    backgroundColor: 'rgba(179, 208, 248, 0.77)'
+  },
+  modalTitle: {
+    textTransform: 'uppercase',
+    fontWeight: 'bold',
+    color:'#fff',
+    fontSize: 24
+  },
+  taskForm: {
+    display: 'flex',
+    gap: 30
+  },
+  formField: {
+      display: 'flex',
+      gap: 15
+  },
+  textInput: {
+    height: 50,
+    width: 300,
+    borderColor: '#fff',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderRadius: 7,
+    paddingLeft: 10
+  },
+  datePicker: {
+    backgroundColor:'#fff'
+  },
+  formButton: {
+    height: 'auto',
+    width: 'auto',
+    borderColor: '#fff',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderRadius: 7,
+    backgroundColor: '#fff',
+    padding:10,
+    shadowColor: 'rgba(179, 208, 248, 0.98)',
+    shadowOffset: {width:3, height:3},
+    shadowRadius: 4,
+    color: 'rgba(179, 208, 248, 0.98)',
+    fontWeight: 'bold'
+  }
 });
