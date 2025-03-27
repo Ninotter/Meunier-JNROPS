@@ -1,11 +1,14 @@
-import { useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, Pressable, SafeAreaView, Modal } from 'react-native';
 import { useTaskStore } from '@/stores/taskStore';
 import { Plus, Trash2 } from 'lucide-react-native';
 
-export default function TasksScreen() {
-  const { tasks, isLoading, error, fetchTasks, deleteTask, updateTask } = useTaskStore();
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import TaskFormModal from '../TaskFormModal';
 
+export default function TasksScreen() {
+  const { tasks, isLoading, error, fetchTasks, createTask, deleteTask, updateTask } = useTaskStore();
+  const [modalVisible, setModalVisible] = useState(false);
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
@@ -55,7 +58,27 @@ export default function TasksScreen() {
           </View>
         )}
       />
-      <Pressable style={styles.fab} testID='add-button'>
+       <SafeAreaProvider>
+                   <SafeAreaView>
+                       <Modal
+                           animationType="slide"
+                           transparent={false}
+                           visible={modalVisible}
+                           onRequestClose={() => {setModalVisible(!modalVisible)}}>
+                               <View>
+                                   <View>
+                                       <Text>Test Modal</Text>
+                                   </View>
+                                   <Pressable
+                                   onPress={() => setModalVisible(!modalVisible)}
+                                   >Fermer</Pressable>
+                               </View>
+                           </Modal>
+                   </SafeAreaView>
+               </SafeAreaProvider>
+      <Pressable
+      onPress={() => setModalVisible(true)}
+      style={styles.fab} testID='add-button'>
         <Plus size={24} color="#FFFFFF" />
       </Pressable>
     </View>
