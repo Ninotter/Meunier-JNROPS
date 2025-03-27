@@ -14,11 +14,12 @@ export interface Task {
   completed: boolean;
   createdAt: string;
   updatedAt: string;
+  limitedAt: string;
 }
 
 export const TasksAPI = {
   getTasks: () => api.get<Task[]>('/tasks'),
-  createTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => 
+  createTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'limitedAt'>) => 
     api.post<Task>('/tasks', task),
   updateTask: (id: string, task: Partial<Task>) => 
     api.patch<Task>(`/tasks/${id}`, task),

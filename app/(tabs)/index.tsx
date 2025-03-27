@@ -37,12 +37,14 @@ export default function TasksScreen() {
               onPress={() => updateTask(item.id, { completed: !item.completed })}
               style={styles.taskContent}>
               <Text style={[
-                styles.taskTitle,
-                item.completed && styles.completedTask
+              styles.taskTitle,
+              item.completed && styles.completedTask
               ]}>
-                {item.title}
+              {item.title}
               </Text>
               <Text style={styles.taskDescription}>{item.description}</Text>
+              <Text style={[styles.taskTitle,
+              item.completed && styles.completedTask]}>Deadline: {item.limitedAt}</Text>
             </Pressable>
             <Pressable
               onPress={() => deleteTask(item.id)}

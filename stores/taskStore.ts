@@ -6,7 +6,7 @@ interface TaskStore {
   isLoading: boolean;
   error: string | null;
   fetchTasks: () => Promise<void>;
-  createTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  createTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'limitedAt'>) => Promise<void>;
   updateTask: (id: string, task: Partial<Task>) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
 }
