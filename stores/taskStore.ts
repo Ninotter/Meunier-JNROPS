@@ -1,15 +1,6 @@
 import { create } from 'zustand';
-import { Task, TasksAPI } from '@/lib/api';
-
-interface TaskStore {
-  tasks: Task[];
-  isLoading: boolean;
-  error: string | null;
-  fetchTasks: () => Promise<void>;
-  createTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'limitedAt'>) => Promise<void>;
-  updateTask: (id: string, task: Partial<Task>) => Promise<void>;
-  deleteTask: (id: string) => Promise<void>;
-}
+import { TasksAPI } from '@/lib/api';
+import { TaskStore } from '@/entity/TaskStore';
 
 export const useTaskStore = create<TaskStore>((set, get) => ({
   tasks: [],

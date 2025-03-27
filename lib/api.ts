@@ -1,3 +1,4 @@
+import { Task } from '@/entity/Task';
 import axios from 'axios';
 
 const api = axios.create({
@@ -6,16 +7,6 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
-
-export interface Task {
-  id: string;
-  title: string;
-  description: string;
-  completed: boolean;
-  createdAt: string;
-  updatedAt: string;
-  limitedAt: string;
-}
 
 export const TasksAPI = {
   getTasks: () => api.get<Task[]>('/tasks'),
