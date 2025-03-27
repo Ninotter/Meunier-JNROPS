@@ -118,4 +118,25 @@ describe('TasksScreen', () => {
     // Vérifie que le bouton flottant est présent
     expect(getByTestId('add-button')).toBeTruthy();
   });
+
+  it('Vérifier que le modal d\'ajout de tâches apparaît bien quand le bouton flottant est déclenché', () => {
+    const mockAddTask = jest.fn();
+    useTaskStore.mockReturnValue({
+      tasks: mockTasks,
+      isLoading: false,
+      error: null,
+      fetchTasks: jest.fn(),
+      deleteTask: jest.fn(),
+      updateTask: jest.fn(),
+      addTask: mockAddTask,
+    });
+
+    const { getByTestId } = render(<TasksScreen />);
+
+    // Simule un appui sur le bouton flottant
+    fireEvent.press(getByTestId('add-button'));
+
+    // Vérifie que le modal d'ajout de tâches est présent
+    expect(getByTestId('add-task-modal')).toBeTruthy();
+  });
 });
