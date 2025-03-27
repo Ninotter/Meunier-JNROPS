@@ -2,15 +2,16 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import TasksScreen from '@/app/(tabs)/index';
 import { useTaskStore } from '@/stores/taskStore';
+import { Task } from '@/entity/Task';
 
 // Mock du store
 jest.mock('@/stores/taskStore');
 
 describe('TasksScreen', () => {
-  const mockTasks = [
-    { id: '1', title: 'Task 1', description: 'Description 1', completed: false },
-    { id: '2', title: 'Task 2', description: 'Description 2', completed: true },
-    { id: '3', title: 'Task 3', description: 'Description 3', completed: false },
+  const mockTasks : Task[] = [
+    { id: '1', title: 'Task 1', description: 'Description 1', completed: false, createdAt: '', updatedAt: '', limitedAt: '' },
+    { id: '2', title: 'Task 2', description: 'Description 2', completed: true, createdAt: '', updatedAt: '', limitedAt: '' },
+    { id: '3', title: 'Task 3', description: 'Description 3', completed: false,   createdAt: '', updatedAt: '', limitedAt: '' },
   ];
 
   it('affiche le message de chargement quand isLoading est vrai', () => {
@@ -116,5 +117,26 @@ describe('TasksScreen', () => {
 
     // Vérifie que le bouton flottant est présent
     expect(getByTestId('add-button')).toBeTruthy();
+  });
+
+  it('Vérifier que le modal d\'ajout de tâches apparaît bien quand le bouton flottant est déclenché', () => {
+    const mockAddTask = jest.fn();
+    useTaskStore.mockReturnValue({
+      tasks: mockTasks,
+      isLoading: false,
+      error: null,
+      fetchTasks: jest.fn(),
+      deleteTask: jest.fn(),
+      updateTask: jest.fn(),
+      addTask: mockAddTask,
+    });
+
+    const { getByTestId } = render(<TasksScreen />);
+
+    // Simule un appui sur le bouton flottant
+    fireEvent.press(getByTestId('add-button'));
+
+    // Vérifie que le modal d'ajout de tâches est présent
+    expect(getByTestId('add-task-modal')).toBeTruthy();
   });
 });
